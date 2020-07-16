@@ -1,0 +1,92 @@
+{% extends 'charity_app/base.html' %}
+
+{% block content %}
+    <header class="header--main-page">
+      <nav class="container container--70">
+          {% if user.is_authenticated %}
+            <ul class="nav--actions">
+              <li class="logged-user">
+                <p>Witaj {{ user.first_name }}</p>
+                <ul class="dropdown">
+                  <li><a href="{% url 'profile' %}">Profil</a></li>
+{#                  <li><a href="{% url 'profile_edit' %}">Ustawienia</a></li>#}
+                  {% if request.user.is_superuser %}
+                  <li>
+                      <a href="admin/">panel administracyjny</a>
+                  </li>
+                  {% endif %}
+                  <li>
+                      <a href="{% url 'logout' %}?next={{ request.get_full_path }}">Wyloguj</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          {% else %}
+              <ul class="nav--actions">
+                  <li><a href="{% url 'login' %}" class="btn btn--small btn--without-border">Zaloguj</a></li>
+                  <li><a href="{% url 'register' %}" class="btn btn--small btn--highlighted">Załóż konto</a></li>
+              </ul>
+          {% endif %}
+
+
+        <ul>
+          <li><a href="{% url 'base' %}" class="btn btn--without-border active">Start</a></li>
+          <li><a href="{% url 'base' %}#steps" class="btn btn--without-border">O co chodzi?</a></li>
+          <li><a href="{% url 'base' %}#about-us" class="btn btn--without-border">O nas</a></li>
+          <li><a href="{% url 'base' %}#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
+            {% if user.is_authenticated %}
+          <li><a href="{% url 'add_donation' %}" class="btn btn--without-border">Przekaż dary</a></li>
+            {% else %}
+          <li><a href="{% url 'login' %}" class="btn btn--without-border">Przekaż dary</a></li>
+            {% endif %}
+          <li><a href="#contact" class="btn btn--without-border">Kontakt</a></li>
+        </ul>
+      </nav>
+
+      <div class="slogan container container--90">
+        <div class="slogan--item">
+          <h1>
+            Zacznij pomagać!<br />
+            Oddaj niechciane rzeczy w zaufane ręce
+              <hr>
+          </h1>
+          <h2>Twoje dane:
+            {{ user.first_name }}
+            {{ user.last_name }}
+            {{ user.email }}
+          </h2>
+
+        </div>
+      </div>
+    </header>
+    <h2>Oddane rzeczy</h2>
+    {% for donat in donations %}
+        <form method="post">
+        {% csrf_token %}
+            <h3>
+                <ul>
+                    <li>Ilosc workow: {{ donat.quantity }}</li>
+                    <li>Wsparta organizacja: {{ donat.institution }}</li>
+                        <li>Kategorie: {% for cat in donat.categories.all %}
+                            {{ cat }},
+                        {% endfor %}</li>
+                    <li>Termin odbioru: {{ donat.pick_up_date }} o {{ donat.pick_up_time }} godz.</li>
+                    <li><input type="checkbox" name="is_taken"></li>
+                    <input type="submit" value="zmien status">
+                </ul>
+            </h3>
+        </form>
+    {% endfor %}
+    {% for donat in donations_not_taken %}
+        <h3 style="color:magenta">
+            <ul>
+                <li>Ilosc workow: {{ donat.quantity }}</li>
+                <li>Wsparta organizacja: {{ donat.institution }}</li>
+                    <li>Kategorie: {% for cat in donat.categories.all %}
+                        {{ cat }},
+                    {% endfor %}</li>
+                <li>Termin odbioru: {{ donat.pick_up_date }} o {{ donat.pick_up_time }} godz.</li>
+            </ul>
+        </h3>
+    {% endfor %}
+{% endblock %}

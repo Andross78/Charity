@@ -1,0 +1,63 @@
+{% extends 'charity_app/base.html' %}
+
+{% block content %}
+    <header class="header--main-page">
+      <nav class="container container--70">
+          {% if user.is_authenticated %}
+            <ul class="nav--actions">
+              <li class="logged-user">
+                <p>Witaj {{ user.first_name }}</p>
+                <ul class="dropdown">
+                  <li><a href="{% url 'profile' %}">Profil</a></li>
+                  <li><a href="#">Ustawienia</a></li>
+                  {% if request.user.is_superuser %}
+                  <li>
+                      <a href="admin/">panel administracyjny</a>
+                  </li>
+                  {% endif %}
+                  <li>
+                      <a href="{% url 'logout' %}?next={{ request.get_full_path }}">Wyloguj</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          {% else %}
+              <ul class="nav--actions">
+                  <li><a href="{% url 'login' %}" class="btn btn--small btn--without-border">Zaloguj</a></li>
+                  <li><a href="{% url 'register' %}" class="btn btn--small btn--highlighted">Załóż konto</a></li>
+              </ul>
+          {% endif %}
+
+
+        <ul>
+          <li><a href="{% url 'base' %}" class="btn btn--without-border active">Start</a></li>
+          <li><a href="{% url 'base' %}#steps" class="btn btn--without-border">O co chodzi?</a></li>
+          <li><a href="{% url 'base' %}#about-us" class="btn btn--without-border">O nas</a></li>
+          <li><a href="{% url 'base' %}#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
+            {% if user.is_authenticated %}
+          <li><a href="{% url 'add_donation' %}" class="btn btn--without-border">Przekaż dary</a></li>
+            {% else %}
+          <li><a href="{% url 'login' %}" class="btn btn--without-border">Przekaż dary</a></li>
+            {% endif %}
+          <li><a href="#contact" class="btn btn--without-border">Kontakt</a></li>
+        </ul>
+      </nav>
+
+      <div class="slogan container container--90">
+        <div class="slogan--item">
+          <form method="post" action="#">
+             {% csrf_token %}
+             <label>Imie: <input type="text" name="first_name" value="{{ request.user.first_name }}"></label><br/>
+             <label>Nazwisko: <input type="text" name="last_name" value="{{ request.user.last_name }}"></label><br/>
+             <label>Email: <input type="email" name="email" value="{{ request.user.email }}"></label><br/>
+             <label>Haslo: <input type="password" name="password"></label><br/>
+             <label>Nowe haslo: <input type="password" name="new_password"></label><br/>
+             <label>Potwierdz haslo: <input type="password" name="confirm_password"></label><br/>
+             <input type="submit" value="zmien dane">
+         </form>
+
+        </div>
+      </div>
+    </header>
+
+{% endblock %}
